@@ -1,9 +1,11 @@
+from flask_cors import CORS
 from flask import Flask, request, jsonify
 import json
 import bcrypt
 import os
 
 app = Flask(__name__)
+CORS(app) 
 
 DATA_FILE = "users.json"
 
