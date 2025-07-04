@@ -45,3 +45,7 @@ def index():
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
 
+@app.route("/users", methods=["GET"])
+def get_users():
+    users = load_users()
+    return jsonify(list(users.keys()))
