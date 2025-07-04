@@ -26,19 +26,19 @@ def register():
     password = data.get("password")
 
     if not username or not password:
-        return jsonify({"message": "Chybí jméno nebo heslo"}), 400
+        return jsonify({"message": "Missing username or password"}), 400
 
     users = load_users()
 
     if username in users:
-        return jsonify({"message": "Uživatel již existuje"}), 409
+        return jsonify({"message": "User already exists"}), 409
 
     hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
     users[username] = hashed_pw
     save_users(users)
 
-    return jsonify({"message": "Uživatel úspěšně registrován"}), 201
+    return jsonify({"message": "User registered successfully"}), 201
 
 @app.route("/users", methods=["GET"])
 def get_users():
@@ -47,8 +47,7 @@ def get_users():
 
 @app.route("/", methods=["GET"])
 def index():
-    return "Backend běží"
-
+    return "Backend is runnig"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
