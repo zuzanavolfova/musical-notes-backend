@@ -52,7 +52,7 @@ def index():
 
 @app.route("/login", methods=["POST"])
 def login():
-    data = reguest.get_json
+    data = request.get_json()
     username = data.get("username")
     password = data.get("password")
 
