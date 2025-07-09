@@ -49,5 +49,26 @@ def get_users():
 def index():
     return "Backend is runnig"
 
+
+@app.route("/login", methods=["POST"])
+def login():
+    data = reguest.get_json
+    username = data.get("username")
+    password = data.get("password")
+
+    if not username or not password:
+        return jsonify({"message": "Missing username or password"}), 400
+
+    users = load_users()
+    hashed_pw = users.get(username)
+
+    if not hashed_pw:
+        return jsonify({"message": "User not found"}), 404
+
+    if bcrypt.checkpw(password.encode(), hashed_pw.encode()):
+        return jsonify({"message": "Login successful"}), 200
+    else:
+        return jsonify({"message": "Incorrect password"}), 401
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
