@@ -42,7 +42,7 @@ def register():
 
     return jsonify({"message": "User registered successfully"}), 201
 
-@app.route("/statistics", methods=["POST"])
+@app.route("/save-statistics", methods=["POST"])
 def save_statistics():
     data = request.get_json()
     username = data.get("userName")
