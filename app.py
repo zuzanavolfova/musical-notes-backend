@@ -72,17 +72,21 @@ def save_statistics():
 
 @app.route("/get-statistics", methods=["GET"])
 def get_statistics():
-    userName = request.args.get("userName")
-    if not userName:
-        return jsonify({"message": "Missing userName parameter"}), 400
+    try:
+        userName = request.args.get("userName")
+        if not userName:
+            return jsonify({"message": "Missing userName parameter"}), 400
 
-    users = load_users()
-    user = users.get(userName)
-    if not user:
-        return jsonify({"message": "User not found"}), 404
+        users = load_users()
+        user = users.get(userName)
+        if not user:
+            return jsonify({"message": "User not found"}), 404
 
-    statistics = user.get("statistics", [])
-    return jsonify(statistics), 200
+        statistics = user.get("statistics", [])
+        return jsonify({"statistics": statistics}), 200
+    
+    except Exception as e:
+        return jsonify({"message": "Internal server error", "error": str(e)}), 500
 
 @app.route("/users", methods=["GET"])
 def get_users():
