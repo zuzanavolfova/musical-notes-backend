@@ -8,15 +8,23 @@ app = Flask(__name__)
 CORS(app) 
 
 DATA_FILE = "users.json"
+
 def load_users():
     if not os.path.exists(DATA_FILE):
         return {}
-    with open(DATA_FILE, "r") as f:
-        return json.load(f)
+    try:
+        with open(DATA_FILE, "r") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"Error loading users: {e}")
+        return {}
 
 def save_users(users):
-    with open(DATA_FILE, "w") as f:
-        json.dump(users, f, indent=2)
+    try:
+        with open(DATA_FILE, "w") as f:
+            json.dump(users, f, indent=2)
+    except IOError as e:
+        print(f"Error saving users: {e}")
 
 @app.route("/register", methods=["POST"])
 def register():
@@ -74,38 +82,40 @@ def save_statistics():
 def get_statistics():
     try:
         userName = request.args.get("userName")
+        print(f"Received request for user: {userName}")
+        
         if not userName:
             return jsonify({"message": "Missing userName parameter"}), 400
 
         users = load_users()
+        print(f"Available users: {list(users.keys())}") 
+        
         user = users.get(userName)
         if not user:
-            return jsonify({"message": "User not found"}), 404
+            print(f"User '{userName}' not found in database")  
+            return jsonify({"message": f"User '{userName}' not found"}), 404
 
         statistics = user.get("statistics", [])
+        print(f"Found statistics for {userName}: {statistics}") 
+        
         return jsonify({"statistics": statistics}), 200
     
     except Exception as e:
+        print(f"Error in get_statistics: {str(e)}")
         return jsonify({"message": "Internal server error", "error": str(e)}), 500
 
 @app.route("/users", methods=["GET"])
 def get_users():
-    users = load_users()
-    user = users.get(userName)
-    if not user:
-        return jsonify({"message": "User not found"}), 404
-
-    statistics = user.get("statistics", [])
-    return jsonify(statistics), 200
-
-@app.route("/users", methods=["GET"])
-def get_users():
-    users = load_users()
-    return jsonify(list(users.keys()))
+    """Get list of all usernames"""
+    try:
+        users = load_users()
+        return jsonify({"users": list(users.keys())}), 200
+    except Exception as e:
+        return jsonify({"message": "Error fetching users", "error": str(e)}), 500
 
 @app.route("/", methods=["GET"])
 def index():
-    return "Backend is runnig"
+    return "Backend is running"
 
 @app.route("/login", methods=["POST"])
 def login():
