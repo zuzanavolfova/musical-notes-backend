@@ -16,6 +16,12 @@ client = MongoClient(MONGO_URI)
 db = client["musical_notes_db"]
 users_col = db["users"]
 
+try:
+    client.admin.command('ping')
+    print("MongoDB connection successful")
+except Exception as e:
+    print(f"MongoDB connection failed: {e}")
+    
 @app.route("/register", methods=["POST"])
 def register():
     data = request.get_json() or {}
