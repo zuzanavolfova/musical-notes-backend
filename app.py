@@ -38,84 +38,79 @@ def register():
         return jsonify({"message": "Database connection failed"}), 503
         
     try:
-       
-        print("=== REGISTER ENDPOINT ZAVOLÁN ===")
-        
+        print("=== REGISTER ENDPOINT CALLED ===")
         
         data = request.get_json()
-        print(f"Data z requestu: {data}")
+        print(f"Request data: {data}")
         
         if not data:
-            print("Žádná JSON data nebyla přijata")
-            return jsonify({"message": "Žádná JSON data nebyla poskytnuta"}), 400
+            print("No JSON data received")
+            return jsonify({"message": "No JSON data provided"}), 400
             
         username = data.get("username")
         password = data.get("password")
         
-        print(f"Uživatelské jméno: {username}, Délka hesla: {len(password) if password else 0}")
+        print(f"Username: {username}, Password length: {len(password) if password else 0}")
 
         if not username or not password:
-            print("Chybí uživatelské jméno nebo heslo")
+            print("Missing username or password")
             return jsonify({"message": "Missing username or password"}), 400
 
-        # Kontrola existence uživatele
-        print("Kontroluji, zda uživatel již existuje...")
+        print("Checking if user already exists...")
         existing_user = users_col.find_one({"username": username})
         if existing_user:
-            print(f"Uživatel {username} již existuje")
+            print(f"User {username} already exists")
             return jsonify({"message": "User already exists"}), 409
 
-        # Hashování hesla
-        print("Hashuji heslo...")
+        print("Hashing password...")
         try:
             password_bytes = password.encode('utf-8')
-            print(f"Heslo převedeno na bytes: {len(password_bytes)} bytů")
+            print(f"Password converted to bytes: {len(password_bytes)} bytes")
             
             salt = bcrypt.gensalt()
-            print(f"Salt vygenerován: {salt}")
+            print(f"Salt generated: {salt}")
             
             hashed_bytes = bcrypt.hashpw(password_bytes, salt)
-            print(f"Heslo zahashováno: {len(hashed_bytes)} bytů")
+            print(f"Password hashed: {len(hashed_bytes)} bytes")
             
             hashed_pw = hashed_bytes.decode('utf-8')
-            print(f"Hash převeden na string: {len(hashed_pw)} znaků")
+            print(f"Hash converted to string: {len(hashed_pw)} characters")
             
         except Exception as hash_error:
-            print(f"Chyba při hashování hesla: {hash_error}")
-            print(f"Typ chyby: {type(hash_error).__name__}")
+            print(f"Error hashing password: {hash_error}")
+            print(f"Error type: {type(hash_error).__name__}")
             import traceback
             print(f"Traceback: {traceback.format_exc()}")
             return jsonify({"message": "Password hashing failed"}), 500
 
-      
-        print("Vytvářím dokument uživatele...")
+        print("Creating user document...")
         user_doc = {
             "username": username,
             "password": hashed_pw,
             "statistics": []
         }
-        print(f"Dokument uživatele vytvořen - username: {user_doc['username']}, password délka: {len(user_doc['password'])}")
+        print(f"User document created - username: {user_doc['username']}, password length: {len(user_doc['password'])}")
 
-        print("Vkládám uživatele do databáze...")
+        print("Inserting user into database...")
         try:
             result = users_col.insert_one(user_doc)
-            print(f"Uživatel vložen s ID: {result.inserted_id}")
+            print(f"User inserted with ID: {result.inserted_id}")
         except Exception as db_error:
-            print(f"Chyba při vkládání do databáze: {db_error}")
-            print(f"Typ chyby: {type(db_error).__name__}")
+            print(f"Database insertion error: {db_error}")
+            print(f"Error type: {type(db_error).__name__}")
             import traceback
             print(f"Traceback: {traceback.format_exc()}")
             return jsonify({"message": "Database insertion failed"}), 500
 
-        print("Registrace úspěšná!")
+        print("Registration successful!")
         return jsonify({"message": "User registered successfully"}), 201
         
     except Exception as e:
-        print(f"=== REGISTER CHYBA ===")
-        print(f"Typ chyby: {type(e).__name__}")
-        print(f"Zpráva chyby: {str(e)}")
+        print(f"=== REGISTER ERROR ===")
+        print(f"Error type: {type(e).__name__}")
+        print(f"Error message: {str(e)}")
         import traceback
-        print(f"Celý traceback: {traceback.format_exc()}")
+        print(f"Full traceback: {traceback.format_exc()}")
         return jsonify({"message": f"Server error: {str(e)}"}), 500
 
 @app.route("/login", methods=["POST"])
