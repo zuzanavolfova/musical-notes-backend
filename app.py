@@ -5,6 +5,7 @@ import os
 from pymongo import MongoClient
 from datetime import datetime
 from dotenv import load_dotenv
+import ssl
 
 load_dotenv()
 app = Flask(__name__)
@@ -17,11 +18,26 @@ db = client["musical_notes_db"]
 users_col = db["users"]
 
 try:
+    client = MongoClient(
+        MONGO_URI,
+        tls=True,
+        tlsInsecure=True,
+        serverSelectionTimeoutMS=5000,
+        connectTimeoutMS=10000,
+        socketTimeoutMS=10000
+    )
+    db = client["musical_notes_db"]
+    users_col = db["users"]
+    
+    # Test připojení
     client.admin.command('ping')
     print("MongoDB connection successful")
 except Exception as e:
     print(f"MongoDB connection failed: {e}")
-    
+    # Fallback - pokračovat bez DB pro debugging
+    client = None
+    db = None
+    users_col = None
 @app.route("/register", methods=["POST"])
 def register():
     data = request.get_json() or {}
@@ -43,6 +59,10 @@ def register():
     })
 
     return jsonify({"message": "User registered successfully"}), 201
+
+    except Exception as e:
+        print(f"Register error: {str(e)}")
+        return jsonify({"message": f"Server error: {str(e)}"}), 500
 
 @app.route("/login", methods=["POST"])
 def login():
