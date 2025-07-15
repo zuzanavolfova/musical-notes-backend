@@ -4,11 +4,13 @@ import bcrypt
 import os
 from pymongo import MongoClient
 from datetime import datetime
+from dotenv import load_dotenv
 
+load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-MONGO_URI = os.getenv("MONGO_URI", "mongodb+srv://dbUser:notes987@cluster0.dz9yok1.mongodb.net/musical_notes_db?retryWrites=true&w=majority")
+MONGO_URI = os.getenv("MONGO_URI")
 client = MongoClient(MONGO_URI)
 db = client["musical_notes_db"]
 users_col = db["users"]
