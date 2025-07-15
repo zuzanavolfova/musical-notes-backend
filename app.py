@@ -34,7 +34,7 @@ except Exception as e:
 
 @app.route("/register", methods=["POST"])
 def register():
-    if not users_col:
+    if users_col is None:
         return jsonify({"message": "Database connection failed"}), 503
         
     try:
@@ -120,7 +120,7 @@ def register():
 
 @app.route("/login", methods=["POST"])
 def login():
-    if not users_col:
+    if users_col is None:
         return jsonify({"message": "Database connection failed"}), 503
         
     try:
@@ -147,7 +147,7 @@ def login():
 
 @app.route("/save-statistics", methods=["POST"])
 def save_statistics():
-    if not users_col:
+    if users_col is None:
         return jsonify({"message": "Database connection failed"}), 503
         
     try:
@@ -177,7 +177,7 @@ def save_statistics():
 
 @app.route("/get-statistics", methods=["GET"])
 def get_statistics():
-    if not users_col:
+    if users_col is None:
         return jsonify({"message": "Database connection failed"}), 503
         
     try:
@@ -197,7 +197,7 @@ def get_statistics():
 
 @app.route("/users", methods=["GET"])
 def get_users():
-    if not users_col:
+    if users_col is None:
         return jsonify({"message": "Database connection failed"}), 503
         
     try:
