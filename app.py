@@ -48,7 +48,7 @@ def register():
         if users_col.find_one({"username": username}):
             return jsonify({"message": "User already exists"}), 409
 
-        hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode('utf-8')
 
         users_col.insert_one({
             "username": username,
@@ -79,7 +79,8 @@ def login():
         if not user:
             return jsonify({"message": "User not found"}), 404
 
-        if bcrypt.checkpw(password.encode(), user["password"]):
+        stored_password = user["password"].encode('utf-8')
+        if bcrypt.checkpw(password.encode(), stored_password):
             return jsonify({"message": "Login successful"}), 200
         else:
             return jsonify({"message": "Incorrect password"}), 401
