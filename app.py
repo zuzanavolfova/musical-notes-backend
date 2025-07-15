@@ -4,13 +4,11 @@ import bcrypt
 import os
 from pymongo import MongoClient
 from datetime import datetime
-from dotenv import load_dotenv
 
-load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-MONGO_URI = os.getenv("MONGO_URI")
+MONGO_URI = os.getenv("MONGO_URI", "<tvůj_connection_string>")
 client = MongoClient(MONGO_URI)
 db = client["musical_notes_db"]
 users_col = db["users"]
